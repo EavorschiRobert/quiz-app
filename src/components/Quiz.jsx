@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import QUESTIONS from "../questions";
 import quizCompleteImg from "../assets/quiz-complete.png";
+import QuestionTimer from "./QuestionTimer";
 
 function Quiz() {
     const [userAnswers, setUsersAnswers] = useState([]);
 
     const activeQuestionIndex = userAnswers.length;
     const quizComplete = activeQuestionIndex === QUESTIONS.length;
-    const handleSelectAnswer = (answer) => {
+    const handleSelectAnswer = useCallback((answer) => {
         setUsersAnswers((prevState) => {
             return [...prevState, answer];
         });
-    };
-    
+    }, []);
+    const handleSkipAnswer = useCallback(
+        () => handleSelectAnswer(null),
+        [handleSelectAnswer]
+    );
+
     if (quizComplete) {
         return (
             <div id="summary">
@@ -28,6 +33,7 @@ function Quiz() {
     return (
         <div id="quiz">
             <div id="question">
+                <QuestionTimer key={activeQuestionIndex} timeout={10000} onTimeout={handleSkipAnswer} />
                 <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
                 <ul id="answers">
                     {shuffledAnswers &&
